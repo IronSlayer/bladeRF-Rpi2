@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 ##################################################
-# Gnuradio Python Flow Graph
+# GNU Radio Python Flow Graph
 # Title: bladeRF_transceiver
 # Author: Renzo Chan Rios
-# Generated: Sat Mar 12 11:30:34 2016
+# Generated: Thu Mar 10 11:24:20 2016
 ##################################################
 
 from gnuradio import analog
@@ -19,6 +19,7 @@ import cc1111
 import math
 import osmosdr
 
+
 class bladeRF_transceiver(gr.top_block):
 
     def __init__(self):
@@ -28,7 +29,7 @@ class bladeRF_transceiver(gr.top_block):
         # Variables
         ##################################################
         self.symbole_rate = symbole_rate = 10e3
-        self.samp_rate = samp_rate = 2e6
+        self.samp_rate = samp_rate = 1e6
         self.rat_interop = rat_interop = 8
         self.rat_decim = rat_decim = 5
         self.firdes_transition_width = firdes_transition_width = 15000
@@ -59,7 +60,7 @@ class bladeRF_transceiver(gr.top_block):
                 fractional_bw=None,
         )
         self.quadrature_demod = analog.quadrature_demod_cf(2)
-        self.osmosdr_source = osmosdr.source( args="numchan=" + str(1) + " " + "bladerf=0,fpga=/home/pi/hostedx40.rbf" )
+        self.osmosdr_source = osmosdr.source( args="numchan=" + str(1) + " " + "bladerf=0,fpga=/home/ipen/hostedx115.rbf" )
         self.osmosdr_source.set_sample_rate(samp_rate)
         self.osmosdr_source.set_center_freq(frequency_rx-frequency_shift, 0)
         self.osmosdr_source.set_freq_corr(0, 0)
@@ -108,19 +109,18 @@ class bladeRF_transceiver(gr.top_block):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.binary_slicer, 0), (self.correlate_access_code, 0))
-        self.connect((self.cc1111_packet_decoder, 0), (self.blocks_null_sink_0, 0))
-        self.connect((self.cc1111_packet_encoder, 0), (self.gmsk_mod, 0))
-        self.connect((self.clock_recovery, 0), (self.binary_slicer, 0))
-        self.connect((self.correlate_access_code, 0), (self.cc1111_packet_decoder, 0))
-        self.connect((self.gmsk_mod, 0), (self.osmosdr_sink, 0))
-        self.connect((self.osmosdr_source, 0), (self.xlating_fir_filter_1, 0))
-        self.connect((self.quadrature_demod, 0), (self.clock_recovery, 0))
-        self.connect((self.rational_resampler, 0), (self.quadrature_demod, 0))
-        self.connect((self.throttle, 0), (self.xlating_fir_filter_0, 0))
-        self.connect((self.xlating_fir_filter_0, 0), (self.rational_resampler, 0))
-        self.connect((self.xlating_fir_filter_1, 0), (self.throttle, 0))
-
+        self.connect((self.binary_slicer, 0), (self.correlate_access_code, 0))    
+        self.connect((self.cc1111_packet_decoder, 0), (self.blocks_null_sink_0, 0))    
+        self.connect((self.cc1111_packet_encoder, 0), (self.gmsk_mod, 0))    
+        self.connect((self.clock_recovery, 0), (self.binary_slicer, 0))    
+        self.connect((self.correlate_access_code, 0), (self.cc1111_packet_decoder, 0))    
+        self.connect((self.gmsk_mod, 0), (self.osmosdr_sink, 0))    
+        self.connect((self.osmosdr_source, 0), (self.xlating_fir_filter_1, 0))    
+        self.connect((self.quadrature_demod, 0), (self.clock_recovery, 0))    
+        self.connect((self.rational_resampler, 0), (self.quadrature_demod, 0))    
+        self.connect((self.throttle, 0), (self.xlating_fir_filter_0, 0))    
+        self.connect((self.xlating_fir_filter_0, 0), (self.rational_resampler, 0))    
+        self.connect((self.xlating_fir_filter_1, 0), (self.throttle, 0))    
 
 
     def get_symbole_rate(self):
@@ -128,20 +128,20 @@ class bladeRF_transceiver(gr.top_block):
 
     def set_symbole_rate(self, symbole_rate):
         self.symbole_rate = symbole_rate
-        self.set_samp_per_sym_source(((self.samp_rate/2/self.firdes_decim)*self.rat_interop/self.rat_decim) / self.symbole_rate)
         self.set_samp_per_sym(int(self.samp_rate / self.symbole_rate))
+        self.set_samp_per_sym_source(((self.samp_rate/2/self.firdes_decim)*self.rat_interop/self.rat_decim) / self.symbole_rate)
 
     def get_samp_rate(self):
         return self.samp_rate
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.set_samp_per_sym_source(((self.samp_rate/2/self.firdes_decim)*self.rat_interop/self.rat_decim) / self.symbole_rate)
-        self.set_samp_per_sym(int(self.samp_rate / self.symbole_rate))
         self.set_firdes_filter(firdes.low_pass(1,self.samp_rate/2, self.firdes_cuttoff, self.firdes_transition_width))
-        self.throttle.set_sample_rate(self.samp_rate/2)
+        self.set_samp_per_sym(int(self.samp_rate / self.symbole_rate))
+        self.set_samp_per_sym_source(((self.samp_rate/2/self.firdes_decim)*self.rat_interop/self.rat_decim) / self.symbole_rate)
         self.osmosdr_sink.set_sample_rate(self.samp_rate)
         self.osmosdr_source.set_sample_rate(self.samp_rate)
+        self.throttle.set_sample_rate(self.samp_rate/2)
 
     def get_rat_interop(self):
         return self.rat_interop
@@ -221,8 +221,8 @@ class bladeRF_transceiver(gr.top_block):
 
     def set_frequency_shift(self, frequency_shift):
         self.frequency_shift = frequency_shift
-        self.xlating_fir_filter_1.set_center_freq(self.frequency_shift)
         self.osmosdr_source.set_center_freq(self.frequency_rx-self.frequency_shift, 0)
+        self.xlating_fir_filter_1.set_center_freq(self.frequency_shift)
 
     def get_frequency_rx(self):
         return self.frequency_rx
@@ -250,11 +250,15 @@ class bladeRF_transceiver(gr.top_block):
     def set_access_code(self, access_code):
         self.access_code = access_code
 
+
 if __name__ == '__main__':
     parser = OptionParser(option_class=eng_option, usage="%prog: [options]")
     (options, args) = parser.parse_args()
     tb = bladeRF_transceiver()
     tb.start()
-    raw_input('Press Enter to quit: ')
+    try:
+        raw_input('Press Enter to quit: ')
+    except EOFError:
+        pass
     tb.stop()
     tb.wait()
