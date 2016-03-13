@@ -58,9 +58,17 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal_handler)
 	try:
 		msg = '=============== EXPERIMENT D1 - Cluster Head Node and Sensor Node Interaction ==============='
+		# Setting BladeRF
 		rf = bladeRF_transceiver.bladeRF_transceiver()
 		rf.set_frequency_tx(long(900e6))
 		rf.set_frequency_rx(long(850e6))
+		rf.set_tx_rf_gain(20)           # [0,25]
+		rf.set_tx_bb_gain(-4)			# [-35,-4]
+		rf.set_rx_rf_gain(3)			# {0, 3, 6}
+		rf.set_rx_bb_gain(40)			# [5,60]
+		rf.set_samp_rate(long(1e6))
+		rf.set_bandwith(long(6e6))
+
 		rf.start()
 		grabartxt()
 		send()

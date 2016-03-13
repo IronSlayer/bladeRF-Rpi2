@@ -21,11 +21,17 @@ if __name__ == '__main__':
 		MSG = 'THIS IS JUST A TEST MESSAGE'
 		rf.set_frequency_tx(long(850e6))
 		rf.set_frequency_rx(long(900e6))
+		rf.set_tx_rf_gain(20)           # [0,25]
+		rf.set_tx_bb_gain(-4)			# [-35,-4]
+		rf.set_rx_rf_gain(3)			# {0, 3, 6}
+		rf.set_rx_bb_gain(40)			# [5,60]
+
 		rf.start()
 		while True:
                         
 			if rf.msg_sink_msgq_out.count():
 				data = rf.msg_sink_msgq_out.delete_head().to_string()
+				print data
 				if data == ID:
 					TS = str(datetime.datetime.now())
 					TS = TS[:19]
