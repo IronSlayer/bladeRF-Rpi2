@@ -3,7 +3,7 @@
 # GNU Radio Python Flow Graph
 # Title: bladeRF_transceiver
 # Author: Renzo Chan Rios
-# Generated: Sat Mar 12 22:19:11 2016
+# Generated: Sat Mar 12 22:13:03 2016
 ##################################################
 
 from gnuradio import analog
@@ -61,7 +61,7 @@ class bladeRF_transceiver(gr.top_block):
                 fractional_bw=None,
         )
         self.quadrature_demod = analog.quadrature_demod_cf(2)
-        self.osmosdr_source = osmosdr.source( args="numchan=" + str(1) + " " + "bladerf=0" )
+        self.osmosdr_source = osmosdr.source( args="numchan=" + str(1) + " " + "bladerf=1" )
         self.osmosdr_source.set_time_now(osmosdr.time_spec_t(time.time()), osmosdr.ALL_MBOARDS)
         self.osmosdr_source.set_sample_rate(samp_rate)
         self.osmosdr_source.set_center_freq(frequency_rx-frequency_shift, 0)
@@ -75,21 +75,21 @@ class bladeRF_transceiver(gr.top_block):
         self.osmosdr_source.set_antenna("", 0)
         self.osmosdr_source.set_bandwidth(6e6, 0)
           
-        self.osmosdr_sink = osmosdr.sink( args="numchan=" + str(1) + " " + "bladerf=0" )
+        self.osmosdr_sink = osmosdr.sink( args="numchan=" + str(1) + " " + "bladerf=1" )
         self.osmosdr_sink.set_sample_rate(samp_rate)
         self.osmosdr_sink.set_center_freq(frequency_tx, 0)
         self.osmosdr_sink.set_freq_corr(0, 0)
         self.osmosdr_sink.set_gain(25, 0)
         self.osmosdr_sink.set_if_gain(0, 0)
-        self.osmosdr_sink.set_bb_gain(-4, 0)
+        self.osmosdr_sink.set_bb_gain(-10, 0)
         self.osmosdr_sink.set_antenna("", 0)
         self.osmosdr_sink.set_bandwidth(6e6, 0)
           
         self.gmsk_mod = digital.gmsk_mod(
-        	samples_per_symbol=int(samp_per_sym),
-        	bt=0.5,
-        	verbose=False,
-        	log=False,
+            samples_per_symbol=int(samp_per_sym),
+            bt=0.5,
+            verbose=False,
+            log=False,
         )
         self.correlate_access_code = digital.correlate_access_code_bb(access_code, 4)
         self.clock_recovery = digital.clock_recovery_mm_ff(samp_per_sym_source*(1+0.0), 0.25*0.175*0.175, 0.5, 0.175, 0.005)
@@ -99,11 +99,11 @@ class bladeRF_transceiver(gr.top_block):
                         preamble=preamble,
                         access_code=access_code,
                         pad_for_usrp=True,
-        		do_whitening=True,
-        		add_crc=True
+                do_whitening=True,
+                add_crc=True
                 ),
-        	source_queue=msg_source_msgq_in
-        	)
+            source_queue=msg_source_msgq_in
+            )
         self.cc1111_packet_decoder = cc1111.cc1111_packet_decoder(msg_sink_msgq_out,True, True, False, True)
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_char*1)
         self.binary_slicer = digital.binary_slicer_fb()
