@@ -60,8 +60,8 @@ if __name__ == '__main__':
 	try:
 		msg = '=============== EXPERIMENT D1 - Cluster Head Node and Sensor Node Interaction ==============='
 		rf = bladeRF_transceiver.bladeRF_transceiver()
-		rf.set_frequency_tx(long(473e6))
-		rf.set_frequency_rx(long(450e6))
+		rf.set_frequency_tx(long(850e6))
+		rf.set_frequency_rx(long(900e6))
 		rf.start()
 		grabartxt()
 		send()
