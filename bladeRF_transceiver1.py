@@ -3,7 +3,7 @@
 # GNU Radio Python Flow Graph
 # Title: bladeRF_transceiver
 # Author: Renzo Chan Rios
-# Generated: Sat Mar 12 22:13:03 2016
+# Generated: Sun Mar 13 00:27:54 2016
 ##################################################
 
 from gnuradio import analog
@@ -36,8 +36,12 @@ class bladeRF_transceiver(gr.top_block):
         self.firdes_transition_width = firdes_transition_width = 15000
         self.firdes_decim = firdes_decim = 4
         self.firdes_cuttoff = firdes_cuttoff = 21e3
+        self.tx_rf_gain = tx_rf_gain = 10
+        self.tx_bb_gain = tx_bb_gain = -20
         self.samp_per_sym_source = samp_per_sym_source = ((samp_rate/2/firdes_decim)*rat_interop/rat_decim) / symbole_rate
         self.samp_per_sym = samp_per_sym = int(samp_rate / symbole_rate)
+        self.rx_rf_gain = rx_rf_gain = 3
+        self.rx_bb_gain = rx_bb_gain = 20
         self.preamble = preamble = '0101010101010101'
         self.msg_source_msgq_in = msg_source_msgq_in = gr.msg_queue(2)
         self.msg_sink_msgq_out = msg_sink_msgq_out = gr.msg_queue(2)
@@ -46,6 +50,7 @@ class bladeRF_transceiver(gr.top_block):
         self.frequency_rx = frequency_rx = 450.0e6
         self.firdes_filter = firdes_filter = firdes.low_pass(1,samp_rate/2, firdes_cuttoff, firdes_transition_width)
         self.bit_per_sym = bit_per_sym = 1
+        self.bandwith = bandwith = 6e6
         self.access_code = access_code = '11010011100100011101001110010001'
 
         ##################################################
@@ -69,21 +74,21 @@ class bladeRF_transceiver(gr.top_block):
         self.osmosdr_source.set_dc_offset_mode(0, 0)
         self.osmosdr_source.set_iq_balance_mode(2, 0)
         self.osmosdr_source.set_gain_mode(False, 0)
-        self.osmosdr_source.set_gain(3, 0)
+        self.osmosdr_source.set_gain(rx_rf_gain, 0)
         self.osmosdr_source.set_if_gain(0, 0)
-        self.osmosdr_source.set_bb_gain(20, 0)
+        self.osmosdr_source.set_bb_gain(rx_bb_gain, 0)
         self.osmosdr_source.set_antenna("", 0)
-        self.osmosdr_source.set_bandwidth(6e6, 0)
+        self.osmosdr_source.set_bandwidth(bandwith, 0)
           
         self.osmosdr_sink = osmosdr.sink( args="numchan=" + str(1) + " " + "bladerf=1" )
         self.osmosdr_sink.set_sample_rate(samp_rate)
         self.osmosdr_sink.set_center_freq(frequency_tx, 0)
         self.osmosdr_sink.set_freq_corr(0, 0)
-        self.osmosdr_sink.set_gain(25, 0)
+        self.osmosdr_sink.set_gain(tx_rf_gain, 0)
         self.osmosdr_sink.set_if_gain(0, 0)
-        self.osmosdr_sink.set_bb_gain(-10, 0)
+        self.osmosdr_sink.set_bb_gain(tx_bb_gain, 0)
         self.osmosdr_sink.set_antenna("", 0)
-        self.osmosdr_sink.set_bandwidth(6e6, 0)
+        self.osmosdr_sink.set_bandwidth(bandwith, 0)
           
         self.gmsk_mod = digital.gmsk_mod(
             samples_per_symbol=int(samp_per_sym),
@@ -180,6 +185,20 @@ class bladeRF_transceiver(gr.top_block):
         self.firdes_cuttoff = firdes_cuttoff
         self.set_firdes_filter(firdes.low_pass(1,self.samp_rate/2, self.firdes_cuttoff, self.firdes_transition_width))
 
+    def get_tx_rf_gain(self):
+        return self.tx_rf_gain
+
+    def set_tx_rf_gain(self, tx_rf_gain):
+        self.tx_rf_gain = tx_rf_gain
+        self.osmosdr_sink.set_gain(self.tx_rf_gain, 0)
+
+    def get_tx_bb_gain(self):
+        return self.tx_bb_gain
+
+    def set_tx_bb_gain(self, tx_bb_gain):
+        self.tx_bb_gain = tx_bb_gain
+        self.osmosdr_sink.set_bb_gain(self.tx_bb_gain, 0)
+
     def get_samp_per_sym_source(self):
         return self.samp_per_sym_source
 
@@ -192,6 +211,20 @@ class bladeRF_transceiver(gr.top_block):
 
     def set_samp_per_sym(self, samp_per_sym):
         self.samp_per_sym = samp_per_sym
+
+    def get_rx_rf_gain(self):
+        return self.rx_rf_gain
+
+    def set_rx_rf_gain(self, rx_rf_gain):
+        self.rx_rf_gain = rx_rf_gain
+        self.osmosdr_source.set_gain(self.rx_rf_gain, 0)
+
+    def get_rx_bb_gain(self):
+        return self.rx_bb_gain
+
+    def set_rx_bb_gain(self, rx_bb_gain):
+        self.rx_bb_gain = rx_bb_gain
+        self.osmosdr_source.set_bb_gain(self.rx_bb_gain, 0)
 
     def get_preamble(self):
         return self.preamble
@@ -245,6 +278,14 @@ class bladeRF_transceiver(gr.top_block):
 
     def set_bit_per_sym(self, bit_per_sym):
         self.bit_per_sym = bit_per_sym
+
+    def get_bandwith(self):
+        return self.bandwith
+
+    def set_bandwith(self, bandwith):
+        self.bandwith = bandwith
+        self.osmosdr_sink.set_bandwidth(self.bandwith, 0)
+        self.osmosdr_source.set_bandwidth(self.bandwith, 0)
 
     def get_access_code(self):
         return self.access_code
